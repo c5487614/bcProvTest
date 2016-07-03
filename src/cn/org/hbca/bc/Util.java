@@ -2,21 +2,6 @@ package cn.org.hbca.bc;
 
 import java.util.Enumeration;
 
-import org.bouncycastle.asn1.ASN1BitString;
-import org.bouncycastle.asn1.ASN1Boolean;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Enumerated;
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1Generator;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Null;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1String;
-
 public class Util {
 
 	public static String getHexString(byte[] data){
@@ -37,6 +22,7 @@ public class Util {
 		return sb.toString();
 	}
 	public static void enumASN1Object(Enumeration enumAsn1Object){
+		/*
 		while(enumAsn1Object.hasMoreElements()){
 			Object asn1Object = enumAsn1Object.nextElement();
 			if(asn1Object instanceof ASN1BitString){
@@ -69,5 +55,6 @@ public class Util {
 				enumASN1Object(asn1Set.getObjects());
 			}
 		}
+		*/
 	}
 }
