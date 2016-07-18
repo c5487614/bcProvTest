@@ -31,8 +31,10 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 
@@ -68,7 +70,19 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509ExtensionUtils;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
+import org.bouncycastle.cms.CMSAlgorithm;
+import org.bouncycastle.cms.CMSEnvelopedData;
+import org.bouncycastle.cms.CMSEnvelopedDataGenerator;
 import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSProcessable;
+import org.bouncycastle.cms.CMSProcessableByteArray;
+import org.bouncycastle.cms.CMSTypedData;
+import org.bouncycastle.cms.RecipientInfoGenerator;
+import org.bouncycastle.cms.RecipientInformation;
+import org.bouncycastle.cms.RecipientInformationStore;
+import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder;
+import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
+import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -96,6 +110,47 @@ public class Test {
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 		
+		Provider provider = new BouncyCastleProvider();
+		Security.addProvider(provider);
+		
+		KeyStore ks = KeyStore.getInstance("PKCS12");
+		ks.load(new FileInputStream("F:/tsaserver.pfx"), "11111111".toCharArray());
+		PrivateKey rootPrikey = null;
+		X509Certificate rootCert = null;
+		Enumeration enums = ks.aliases();
+		while(enums.hasMoreElements()){
+			String keyAlias = (String) enums.nextElement();  
+			System.out.println("alias=[" + keyAlias + "]");  
+			if(ks.isKeyEntry(keyAlias)){
+				System.out.println("isKeyEntry=[" + keyAlias + "]");
+				rootPrikey=(PrivateKey)ks.getKey(keyAlias, "11111111".toCharArray());
+				
+				rootCert = (X509Certificate) ks.getCertificate(keyAlias);
+			}
+			if(ks.isCertificateEntry(keyAlias)){
+				System.out.println("isCertificateEntry=[" + keyAlias + "]");  
+			}
+		}
+		
+		CMSTypedData msg = new CMSProcessableByteArray("Hello World!".getBytes());
+
+		CMSEnvelopedDataGenerator gen = new CMSEnvelopedDataGenerator();
+		gen.addRecipientInfoGenerator(new JceKeyTransRecipientInfoGenerator(rootCert));
+		
+		CMSEnvelopedData enveloped = gen.generate(msg, new JceCMSContentEncryptorBuilder(CMSAlgorithm.AES256_CBC).build());
+		
+		Base64 base64 = new Base64();
+		System.out.println(new String(base64.encode(enveloped.getEncoded())));
+		RecipientInformationStore recipients = enveloped.getRecipientInfos();
+		Collection c = recipients.getRecipients();
+		Iterator it = c.iterator();
+		if (it.hasNext()) {
+			RecipientInformation recipient = (RecipientInformation) it.next();
+			byte[] recData = recipient.getContent(new JceKeyTransEnvelopedRecipient(rootPrikey).setProvider("BC"));
+			System.out.println(new String(recData));
+		}
+	}
+	private static void generateP12File() throws Exception{
 		Provider provider = new BouncyCastleProvider();
 		Security.addProvider(provider);
 		
@@ -165,15 +220,7 @@ public class Test {
 	    
 	    FileOutputStream fs1 = new FileOutputStream("F:/test1.p12");
 	    createPKCS12File(fs1,keyPair.getPrivate(),new Certificate[]{c,c,c});
-	    
-//	    KeyStore store = KeyStore.getInstance("PKCS12", "BC");
-//	    store.load(null, null);
-//	    //store.setCertificateEntry("11111111-1111-1111-1111-111111111111", certificate);
-//	    store.setKeyEntry("11111111-1111-1111-1111-111111111111", keyPair.getPrivate().getEncoded(), null);
-//	    store.store(new FileOutputStream("F:/test1.pfx"), "11111111".toCharArray());
-	    
 	}
-	
 	private static void createPKCS12File(OutputStream pfxOut, PrivateKey key, Certificate[] chain)
 	        throws Exception
 	    {
