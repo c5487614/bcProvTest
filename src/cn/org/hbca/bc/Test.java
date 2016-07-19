@@ -27,21 +27,15 @@ import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CertStore;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-
 import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Locale;
-
 import java.util.Set;
 
 import javax.crypto.BadPaddingException;
@@ -53,29 +47,10 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-
 import org.bouncycastle.asn1.ASN1Encoding;
-
 import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
-
-import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
-import org.bouncycastle.asn1.tsp.TimeStampResp;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.KeyPurposeId;
-import org.bouncycastle.cert.jcajce.JcaCertStore;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.SignerInfoGenerator;
-import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
-import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoGeneratorBuilder;
-
 import org.bouncycastle.asn1.DERBMPString;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
@@ -108,20 +83,11 @@ import org.bouncycastle.cms.RecipientInformationStore;
 import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder;
 import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator;
-
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
-
-import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
-import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
-import org.bouncycastle.operator.DigestCalculator;
-import org.bouncycastle.operator.DigestCalculatorProvider;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
-
 import org.bouncycastle.operator.DigestCalculator;
 import org.bouncycastle.operator.OutputEncryptor;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
@@ -133,116 +99,54 @@ import org.bouncycastle.pkcs.PKCS12SafeBagBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS12SafeBagBuilder;
 import org.bouncycastle.pkcs.jcajce.JcePKCS12MacCalculatorBuilder;
 import org.bouncycastle.pkcs.jcajce.JcePKCSPBEOutputEncryptorBuilder;
-
 import org.bouncycastle.tsp.TSPAlgorithms;
 import org.bouncycastle.tsp.TimeStampRequest;
 import org.bouncycastle.tsp.TimeStampRequestGenerator;
 import org.bouncycastle.tsp.TimeStampResponse;
-<<<<<<< HEAD
-import org.bouncycastle.tsp.TimeStampResponseGenerator;
-import org.bouncycastle.tsp.TimeStampToken;
-import org.bouncycastle.tsp.TimeStampTokenGenerator;
-import org.bouncycastle.util.Store;
-
 import org.bouncycastle.util.encoders.Base64;
 
 public class Test {
 
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
-
-		//signDataVerify();
-//		TimeStampTest();
-		String dataB64 = "MEMCAQEwMTANBglghkgBZQMEAgEFAAQgcWC905SZZOq+1f53M3anm1HIIv3bJ7pwYJUGrbFqZnoCCMewWlJhY/kOAQH/";
-		Base64 base64 = new Base64();
-		ASN1InputStream ais = new ASN1InputStream(base64.decode(dataB64));
-	    ASN1Sequence asnSeq = (ASN1Sequence) ais.readObject();
-	    Enumeration enum1 = asnSeq.getObjects();
-	    //byte 
-	    byte[] data = getHashData(enum1);
-	    System.out.println(data.length);
-	    System.out.println(Util.bytesToHexString(data));
-	    //get hexStr
-	    enum1 = asnSeq.getObjects();
-	    //byte 
-	    String hashMethod = getHashMethod(enum1);
-	    System.out.println(hashMethod);
-	    //Util.enumASN1Object(enum1);
-	    ais.close();
+		AESEncrypt();
 	}
-	private static ASN1Integer getNounce(Enumeration enum1) {
-		// int
-		Object asn1Object = enum1.nextElement();
-		// seq
-		ASN1Sequence asnSeq1 = (ASN1Sequence) enum1.nextElement();
-		// nounce
-		
-		ASN1Integer asn1Int = (ASN1Integer) enum1.nextElement();;
-		
-		return asn1Int;
-	}
-	private static String getHashMethod(Enumeration enum1){
-		Object asn1Object = enum1.nextElement();
-		ASN1Sequence asnSeq1 = (ASN1Sequence) enum1.nextElement();
-		enum1 = asnSeq1.getObjects();
-		asnSeq1 = (ASN1Sequence) enum1.nextElement();
-		enum1 = asnSeq1.getObjects();
-
-		ASN1ObjectIdentifier asn1ObjectIndentifier = (ASN1ObjectIdentifier) enum1.nextElement();
-		StringBuffer sb = new StringBuffer();
-		try {
-			
-			sb.append(new String(asn1ObjectIndentifier.getEncoded()));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		System.out.println(sb.toString());
-		System.out.println(asn1ObjectIndentifier.getId());
-		
-		if("2.16.840.1.101.3.4.2.1".equals(sb.toString())){
-			return "SHA256";
-		}else if("1.3.14.3.2.26".equals(sb.toString())){
-			return "SHA1";
-		}else{
-			return "SHA1";
-		}
-		
-//		return sb.toString();
-	}
-	private static byte[] getHashData(Enumeration enum1){
-		//int
-		Object asn1Object = enum1.nextElement();
-    	//seq
-		ASN1Sequence asnSeq1 = (ASN1Sequence) enum1.nextElement();
-		//seq hash
-    	enum1 = asnSeq1.getObjects();
-    	asnSeq1 = (ASN1Sequence) enum1.nextElement();
-    	
-    	DEROctetString derOctetStr = (DEROctetString) enum1.nextElement();
-    	String hexStr = derOctetStr.toString().replace("#", "");
-    	return derOctetStr.getOctets();
-		//return Util.hexStringToByte(hexStr);
-	}
-	private static void TimeStampTest3()throws Exception {
+	private static void envelopTest2()throws Exception{
 		Provider provider = new BouncyCastleProvider();
 		Security.addProvider(provider);
-		Base64 base64 = new Base64();
-		String TSA_URL = "http://timestamp.wosign.com/rfc3161";
-		String data = "HBCA20160614";
-		byte[] digest = MessageDigest.getInstance("SHA1").digest(data.getBytes());
-		TimeStampRequestGenerator reqgen = new TimeStampRequestGenerator();
-        TimeStampRequest req = reqgen.generate(TSPAlgorithms.SHA1, digest);
-        //byte[] request = req.getEncoded();
-        
-        PrivateKey privateKey = null;
-        X509Certificate cert = null;
-        
-        KeyStore ks = KeyStore.getInstance("PKCS12");
-		ks.load(new FileInputStream("F:/tsaserver.pfx"), "11111111".toCharArray());
-
 		
+		KeyStore ks = KeyStore.getInstance("PKCS12");
+		ks.load(new FileInputStream("Z:/十堰机构测试_加密.pfx"), "11111111".toCharArray());
+		PrivateKey rootPrikey = null;
+		X509Certificate rootCert = null;
+		Enumeration enums = ks.aliases();
+		while(enums.hasMoreElements()){
+			String keyAlias = (String) enums.nextElement();  
+			System.out.println("alias=[" + keyAlias + "]");  
+			if(ks.isKeyEntry(keyAlias)){
+				System.out.println("isKeyEntry=[" + keyAlias + "]");
+				rootPrikey=(PrivateKey)ks.getKey(keyAlias, "11111111".toCharArray());
+				
+				rootCert = (X509Certificate) ks.getCertificate(keyAlias);
+			}
+			if(ks.isCertificateEntry(keyAlias)){
+				System.out.println("isCertificateEntry=[" + keyAlias + "]");  
+			}
+		}
+		String envelopB64 = "MIIBmAYJKoZIhvcNAQcDoIIBiTCCAYUCAQAxggEpMIIBJQIBADCBjTB5MQswCQYDVQQGEwJDTjEOMAwGA1UECAwFSFVCRUkxDjAMBgNVBAcMBVdVSEFOMTswOQYDVQQKDDJIdWlCZWkgRGlnaXRhbCBDZXJ0aWZpY2F0ZSBBdXRob3JpdHkgQ2VudGVyIENPLkxURDENMAsGA1UEAwwESEJDQQIQE1xhKfb+ItNhta/KYGm9mzANBgkqgRzPVQGCLQMFAASBgLaAKu3feHzgp+vFi0fbfok/nWrIoJj8YZakpqzSNPOwSB7U6/Jx4RQKr2em78COmQaGMBHMszXOSibGnE6WfRUiH0s2QNby7U+I5PwbGgXW/NQD6R8JaOzbsEYBFkaBqbNDirIVcZGV3bF+VtJzsqZECoZCMmHAnZjlb4kbPae9MFMGCSqGSIb3DQEHATAUBggqhkiG9w0DBwQIp3KRufXjzNKAMHVVYpg/ghBRYhk1LhAl9xC/ooC55zjkOnx8eOgHtWJDQmF8M4A/hSHKHdt2m8GU5Q==";
+		envelopB64 = "MIIBmAYJKoZIhvcNAQcDoIIBiTCCAYUCAQAxggEpMIIBJQIBADCBjTB5MQswCQYDVQQGEwJDTjEOMAwGA1UECAwFSFVCRUkxDjAMBgNVBAcMBVdVSEFOMTswOQYDVQQKDDJIdWlCZWkgRGlnaXRhbCBDZXJ0aWZpY2F0ZSBBdXRob3JpdHkgQ2VudGVyIENPLkxURDENMAsGA1UEAwwESEJDQQIQE1xhKfb+ItNhta/KYGm9mzANBgkqhkiG9w0BAQEFAASBgIx8Zeu6syqtPSNcKVBcasyrp3QSBvhOHj8spq8quGpR60t4TcDbmiozqgwgYtuzn2ZRP4BRcPd0RNb4JJRYIYrjJoSsqoeEyNZGUHtQuwAq1gF5BfpWHMdlIwpo3zMJqvGdI3qmjQqsmEPo1gs8VjpnDK9fXlWIs7ZVc05jh4VdMFMGCSqGSIb3DQEHATAUBggqhkiG9w0DBwQILLKxGZ1xt1KAMAeAWD7uN0K9RpZU+1moiXyYoFhhj+nMZZWakPJmWy6RQywe5xdxVvlkMWyhoEQuKw==";
+		Base64 base64 = new Base64();
+		CMSEnvelopedData enveloped = new CMSEnvelopedData(base64.decode(envelopB64));
+		RecipientInformationStore recipients = enveloped.getRecipientInfos();
+		Collection c = recipients.getRecipients();
+		Iterator it = c.iterator();
+		if (it.hasNext()) {
+			RecipientInformation recipient = (RecipientInformation) it.next();
+			byte[] recData = recipient.getContent(new JceKeyTransEnvelopedRecipient(rootPrikey).setProvider("BC"));
+			System.out.println(new String(recData));
+		}
+	}
+	private static void envelopTest()throws Exception{
 		Provider provider = new BouncyCastleProvider();
 		Security.addProvider(provider);
 		
@@ -250,75 +154,27 @@ public class Test {
 		ks.load(new FileInputStream("F:/tsaserver.pfx"), "11111111".toCharArray());
 		PrivateKey rootPrikey = null;
 		X509Certificate rootCert = null;
-
 		Enumeration enums = ks.aliases();
 		while(enums.hasMoreElements()){
 			String keyAlias = (String) enums.nextElement();  
 			System.out.println("alias=[" + keyAlias + "]");  
 			if(ks.isKeyEntry(keyAlias)){
 				System.out.println("isKeyEntry=[" + keyAlias + "]");
-
-				privateKey = (PrivateKey)ks.getKey(keyAlias, "11111111".toCharArray());
-				cert = (X509Certificate) ks.getCertificate(keyAlias);
-
 				rootPrikey=(PrivateKey)ks.getKey(keyAlias, "11111111".toCharArray());
 				
 				rootCert = (X509Certificate) ks.getCertificate(keyAlias);
-
 			}
 			if(ks.isCertificateEntry(keyAlias)){
 				System.out.println("isCertificateEntry=[" + keyAlias + "]");  
 			}
 		}
-
-		JcaDigestCalculatorProviderBuilder builder = new JcaDigestCalculatorProviderBuilder();
-		
-		DigestCalculator dgCalc =  builder.setProvider("BC").build().get(new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1));
-		ContentSigner signer = new JcaContentSignerBuilder("SHA1withRSA").build(privateKey);
-		
-		
-		DigestCalculatorProvider dcp = builder.build();
-		JcaSignerInfoGeneratorBuilder jcaSIGB = new JcaSignerInfoGeneratorBuilder(dcp);
-		SignerInfoGenerator siGen = jcaSIGB.build(signer, cert);
-		ASN1ObjectIdentifier policy = new ASN1ObjectIdentifier("1.2.3.4.5.6"); // Replace by your timestamping policy OID
-		TimeStampTokenGenerator tstGen = new TimeStampTokenGenerator(siGen, dgCalc, policy);
-		/* Set the parameters e.g. set the accuracy or include the signing certificate */
-		TimeStampToken tst = tstGen.generate(req, new BigInteger("23"), new Date());
-		byte[] encoding = tst.getEncoded();
-		
-		TimeStampResponseGenerator tsRespGen = new TimeStampResponseGenerator(tstGen, TSPAlgorithms.ALLOWED);
-		TimeStampResponse tsResp = tsRespGen.generate(req, new BigInteger("23"), new Date());
-		tsResp = new TimeStampResponse(tsResp.getEncoded());
-		
-		System.out.println(tsResp.getStatusString());
-		System.out.println(tsResp.getTimeStampToken().getTimeStampInfo().getGenTime());
-		System.out.println(new String(base64.encode(tsResp.getEncoded())));
-		System.out.println(new String(base64.encode(req.getEncoded())));
-	}
-	private static void TimeStampTest2()throws Exception {
-		Provider provider = new BouncyCastleProvider();
-		Security.addProvider(provider);
-		Base64 base64 = new Base64();
-		String TSA_URL = "http://timestamp.wosign.com/rfc3161";
-		String data = "HBCA20160614";
-		byte[] digest = MessageDigest.getInstance("SHA1").digest(data.getBytes());
-		TimeStampRequestGenerator reqgen = new TimeStampRequestGenerator();
-        TimeStampRequest req = reqgen.generate(TSPAlgorithms.SHA1, digest);
-        //byte[] request = req.getEncoded();
-        
-        PrivateKey privateKey = null;
-        X509Certificate cert = null;
-        
-        KeyStore ks = KeyStore.getInstance("PKCS12");
-		ks.load(new FileInputStream("F:/tsaserver.pfx"), "11111111".toCharArray());
-
 		
 		CMSTypedData msg = new CMSProcessableByteArray("Hello World!".getBytes());
 
 		CMSEnvelopedDataGenerator gen = new CMSEnvelopedDataGenerator();
 		gen.addRecipientInfoGenerator(new JceKeyTransRecipientInfoGenerator(rootCert));
 		
-		CMSEnvelopedData enveloped = gen.generate(msg, new JceCMSContentEncryptorBuilder(CMSAlgorithm.AES256_CBC).build());
+		CMSEnvelopedData enveloped = gen.generate(msg, new JceCMSContentEncryptorBuilder(CMSAlgorithm.DES_EDE3_CBC).build());
 		
 		Base64 base64 = new Base64();
 		System.out.println(new String(base64.encode(enveloped.getEncoded())));
@@ -339,75 +195,20 @@ public class Test {
 		ks.load(new FileInputStream("F:/tsaserver.pfx"), "11111111".toCharArray());
 		PrivateKey rootPrikey = null;
 		X509Certificate rootCert = null;
-
 		Enumeration enums = ks.aliases();
 		while(enums.hasMoreElements()){
 			String keyAlias = (String) enums.nextElement();  
 			System.out.println("alias=[" + keyAlias + "]");  
 			if(ks.isKeyEntry(keyAlias)){
 				System.out.println("isKeyEntry=[" + keyAlias + "]");
-
-				privateKey = (PrivateKey)ks.getKey(keyAlias, "11111111".toCharArray());
-				cert = (X509Certificate) ks.getCertificate(keyAlias);
-
 				rootPrikey=(PrivateKey)ks.getKey(keyAlias, "11111111".toCharArray());
 				
 				rootCert = (X509Certificate) ks.getCertificate(keyAlias);
-
 			}
 			if(ks.isCertificateEntry(keyAlias)){
 				System.out.println("isCertificateEntry=[" + keyAlias + "]");  
 			}
 		}
-
-		System.out.println(cert.getSubjectDN().toString());
-		
-		AlgorithmIdentifier sha1withRSA = new DefaultSignatureAlgorithmIdentifierFinder().find("SHA1withRSA");
-//		AlgorithmIdentifier digestAlgorithmIdentifier = new DefaultDigestAlgorithmIdentifierFinder().find(sha1withRSA.getAlgorithm().getId());
-		
-		JcaDigestCalculatorProviderBuilder builder = new JcaDigestCalculatorProviderBuilder();
-		DigestCalculator dgCalc =  builder.setProvider("BC").build().get(new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1));
-		ContentSigner signer = new JcaContentSignerBuilder("SHA1withRSA").build(privateKey);
-	
-		DigestCalculatorProvider dcp = builder.build();
-		JcaSignerInfoGeneratorBuilder jcaSIGB = new JcaSignerInfoGeneratorBuilder(dcp);
-		SignerInfoGenerator siGen = jcaSIGB.build(signer, cert);
-		Extension ext = siGen.getAssociatedCertificate().getExtension(Extension.extendedKeyUsage);
-
-		System.out.println(ext.getExtnId().getId());
-        System.out.println(ext.isCritical());
-        ExtendedKeyUsage extKey = ExtendedKeyUsage.getInstance(ext.getParsedValue());
-
-		ASN1ObjectIdentifier policy = new ASN1ObjectIdentifier("2.4.16.11.7.1"); // Replace by your timestamping policy OID
-		//TimeStampTokenGenerator tstGen = new TimeStampTokenGenerator(siGen, dgCalc, policy);
-		TimeStampTokenGenerator tstGen = new TimeStampTokenGenerator(
-                new JcaSimpleSignerInfoGeneratorBuilder().build("SHA1withRSA", privateKey, cert), dgCalc, new ASN1ObjectIdentifier("1.2"));
-		
-		ArrayList<X509Certificate> certList = new ArrayList<X509Certificate>();
-        certList.add(cert);
-        JcaCertStore certs = new JcaCertStore(certList);
-        
-        tstGen.addAttributeCertificates(certs);
-		tstGen.addCertificates(certs);
-		tstGen.addCRLs(certs);
-		/* Set the parameters e.g. set the accuracy or include the signing certificate */
-		
-		//TimeStampToken tst = tstGen.generate(req, new BigInteger("13"), new Date());
-		
-		TimeStampResponseGenerator tsRespGen = new TimeStampResponseGenerator(tstGen, TSPAlgorithms.ALLOWED);
-		TimeStampResponse tsResp = tsRespGen.generate(req, new BigInteger("23"), new Date());
-		tsResp = new TimeStampResponse(tsResp.getEncoded());
-
-		System.out.println(tsResp.getStatusString());
-		System.out.println(tsResp.getTimeStampToken().getTimeStampInfo().getGenTime());
-		
-		System.out.println(new String(base64.encode(tsResp.getEncoded())));
-		System.out.println(new String(base64.encode(req.getEncoded())));
-	}
-	private static void TimeStampTest() throws Exception {
-		Base64 base64 = new Base64();
-		String TSA_URL = "http://timestamp.wosign.com/rfc3161";
-
 		
 		//initial key pair
 		KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA", BouncyCastleProvider.PROVIDER_NAME);
@@ -502,7 +303,6 @@ public class Test {
 	private static void TimeStampTest() throws Exception {
 		Base64 base64 = new Base64();
 		String TSA_URL = "http://tsa.wosign.com/rfc3161";
-
 		String data = "HBCA20160614";
 		byte[] digest = MessageDigest.getInstance("SHA1").digest(data.getBytes());
 		TimeStampRequestGenerator reqgen = new TimeStampRequestGenerator();
@@ -526,17 +326,10 @@ public class Test {
         if (con.getResponseCode() != HttpURLConnection.HTTP_OK) {
             throw new IOException("Received HTTP error: " + con.getResponseCode() + " - " + con.getResponseMessage());
         }
-
-        InputStream in = con.getInputStream();
-        TimeStampResp resp = TimeStampResp.getInstance(new ASN1InputStream(in).readObject());
-        TimeStampResponse response = new TimeStampResponse(resp);
-        
-
         
         InputStream in = con.getInputStream();
         TimeStampResp resp = TimeStampResp.getInstance(new ASN1InputStream(in).readObject());
         TimeStampResponse response = new TimeStampResponse(resp);
-
         response.validate(req);
         System.out.println(response.getTimeStampToken().getSID().getIssuer());
         System.out.println(response.getTimeStampToken().getTimeStampInfo().getGenTime());
