@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Locale;
 
+<<<<<<< HEAD
 import org.bouncycastle.asn1.ASN1BitString;
 import org.bouncycastle.asn1.ASN1Boolean;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -19,6 +20,8 @@ import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DEROctetString;
 
+=======
+>>>>>>> 6ea783ac2bbc5a52429662a1068cdb9e3493ce2c
 public class Util {
 
 	public static byte[] hexStringToByte(String hex) {
@@ -67,8 +70,13 @@ public class Util {
 		}
 		return sb.toString();
 	}
+<<<<<<< HEAD
 	public static void enumASN1Object(Enumeration enumAsn1Object) throws IOException{
 		
+=======
+	public static void enumASN1Object(Enumeration enumAsn1Object){
+		/*
+>>>>>>> 6ea783ac2bbc5a52429662a1068cdb9e3493ce2c
 		while(enumAsn1Object.hasMoreElements()){
 			Object asn1Object = enumAsn1Object.nextElement();
 			if(asn1Object instanceof ASN1BitString){
@@ -110,6 +118,10 @@ public class Util {
 				System.out.println(asn1Object.getClass());
 			}
 		}
+<<<<<<< HEAD
 		
+=======
+		*/
+>>>>>>> 6ea783ac2bbc5a52429662a1068cdb9e3493ce2c
 	}
 }
